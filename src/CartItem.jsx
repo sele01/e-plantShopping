@@ -1,38 +1,63 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { removeItem, updateQuantity } from './CartSlice';
 import './CartItem.css';
 
+function CartItem({ onContinueShopping }) {
+    const dispatch = useDispatch();
+    const cart = useSelector(state => state.cart.items || []);
 
-const CartItem = ({ onContinueShopping }) => {
-  const cart = useSelector(state => state.cart.items);
-  const dispatch = useDispatch();
+    // Calculate total amount for all items in the cart
+    const calculateTotalAmount = () => {
+        let total = 0;
+        cart.forEach(item => {
+            const price = parseFloat(item.cost.substring(1)); // Remove '$' and convert to number
+            total += price * item.quantity;
+        });
+        return total.toFixed(2); // Return total with 2 decimal places
+    };
 
-  // Calculate total amount for all products in the cart
-  const calculateTotalAmount = () => {
- 
-  };
+    // Calculate subtotal for a specific item
+    const calculateTotalCost = (item) => {
+        const price = parseFloat(item.cost.substring(1)); // Remove '$' and convert to number
+        return (price * item.quantity).toFixed(2);
+    };
 
-  const handleContinueShopping = (e) => {
-   
-  };
+    // Handle increment quantity
+    const handleIncrement = (item) => {
+        dispatch(updateQuantity({ 
+            id: item.id, 
+            quantity: item.quantity + 1 
+        }));
+    };
 
+    // Handle decrement quantity or remove if quantity is 1
+    const handleDecrement = (item) => {
+        if (item.quantity > 1) {
+            dispatch(updateQuantity({ 
+                id: item.id, 
+                quantity: item.quantity - 1 
+            }));
+        } else {
+            dispatch(removeItem(item.id));
+        }
+    };
 
+    // Handle remove item from cart
+    const handleRemove = (item) => {
+        dispatch(removeItem(item.id));
+    };
 
-  const handleIncrement = (item) => {
-  };
+    // Handle continue shopping
+    const handleContinueShopping = (e) => {
+        e.preventDefault();
+        onContinueShopping(e);
+    };
 
-  const handleDecrement = (item) => {
-   
-  };
-
-  const handleRemove = (item) => {
-  };
-
-  // Calculate total cost based on quantity for an item
-  const calculateTotalCost = (item) => {
-  };
-
+    // Handle checkout (placeholder for future implementation)
+    const handleCheckoutShopping = (e) => {
+        alert('Functionality to be added in future updates.');
+    };
   return (
     <div className="cart-container">
       <h2 style={{ color: 'black' }}>Total Cart Amount: ${calculateTotalAmount()}</h2>
